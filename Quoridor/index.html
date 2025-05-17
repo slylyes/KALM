@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>3D Quoridor - Three.js</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="canvas-container">
+            <div id="game-message"></div>
+            
+            <!-- Wall orientation controls -->
+            <div id="wall-orientation-controls">
+                <h3>Wall Orientation</h3>
+                <div class="wall-btn-container">
+                    <div id="horizontal-wall" class="wall-orientation-btn active" title="Horizontal Wall">
+                        <div class="icon"></div>
+                    </div>
+                    <div id="vertical-wall" class="wall-orientation-btn" title="Vertical Wall">
+                        <div class="icon"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="ui-container">
+            <div id="game-status">
+                <h2>Quoridor 3D</h2>
+                <p id="current-player">Current Player: <span>Player 1</span></p>
+                <p id="walls-left">Walls Left: <span>10</span></p>
+                <span id="mode-indicator" class="mode-move">Movement Mode</span>
+            </div>
+            <div id="game-controls">
+                <button id="toggle-mode" class="mode-button move">Switch to Wall Mode</button>
+                <button id="start-game">New Game</button>
+                <button id="help-button">How to Play</button>
+                <div class="player-select">
+                    <label for="player-count">Players:</label>
+                    <select id="player-count">
+                        <option value="2">2 Players</option>
+                        <option value="4">4 Players</option>
+                    </select>
+                </div>
+                <div class="ai-controls">
+                    <label for="ai-difficulty">AI Difficulty:</label>
+                    <select id="ai-difficulty">
+                        <option value="easy">Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="help-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>How to Play Quoridor</h2>
+            
+            <div class="instructions">
+                <div class="instruction-section">
+                    <h3>Game Objective</h3>
+                    <p>The goal of Quoridor is to be the first player to move your pawn to the opposite edge of the board.</p>
+                    <ul>
+                        <li>Player 1 (blue) starts at the top and moves to the bottom edge</li>
+                        <li>Player 2 (red) starts at the bottom and moves to the top edge</li>
+                        <li>In 4-player mode, players 3 and 4 move from left to right and right to left</li>
+                    </ul>
+                </div>
+                
+                <div class="instruction-section">
+                    <h3>Moving Your Pawn</h3>
+                    <p>On your turn, you may either move your pawn or place a wall:</p>
+                    <ul>
+                        <li><strong>To move your pawn:</strong> Click on a highlighted square adjacent to your current position</li>
+                        <li>You can move one square at a time in any orthogonal direction (up, down, left, right)</li>
+                        <li>If an opponent's pawn is in an adjacent square, you can jump over it if there's no wall behind it</li>
+                    </ul>
+                </div>
+                
+                <div class="instruction-section">
+                    <h3>Placing Walls</h3>
+                    <p>You start with 10 walls. Use them strategically to block your opponents:</p>
+                    <ul>
+                        <li><strong>To place a wall:</strong> Hover over the wall guides between squares, then click when you see the red wall preview</li>
+                        <li>Walls block pawns from moving through them</li>
+                        <li>You cannot place walls that completely block a player's path to their goal</li>
+                        <li>Walls cannot intersect or overlap with existing walls</li>
+                    </ul>
+                </div>
+                
+                <div class="instruction-section">
+                    <h3>Camera Controls</h3>
+                    <p>You can adjust your view of the board:</p>
+                    <ul>
+                        <li><strong>Rotate:</strong> Click and drag with the left mouse button</li>
+                        <li><strong>Zoom:</strong> Use the mouse wheel to zoom in and out</li>
+                        <li><strong>Pan:</strong> Click and drag with the right mouse button</li>
+                    </ul>
+                </div>
+
+                <div class="instruction-section">
+                    <h3>Game Modes</h3>
+                    <p>You can switch between two modes of play:</p>
+                    <ul>
+                        <li><strong>Movement Mode:</strong> Click on highlighted squares to move your pawn</li>
+                        <li><strong>Wall Placement Mode:</strong> Click between squares to place walls</li>
+                        <li>Use the <strong>"Switch to Wall/Move Mode"</strong> button to toggle between modes</li>
+                        <li>In Wall Mode, you can choose between <strong>horizontal</strong> and <strong>vertical</strong> walls using the controls in the top-right corner</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Three.js Library (use specific version for reliability) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r132/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <!-- Game Scripts -->
+    <script src="js/utils.js"></script>
+    <script src="js/board.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/wall.js"></script>
+    <script src="js/gameLogic.js"></script>
+    <script src="js/ai.js"></script>
+    <script src="js/ui.js"></script>
+    
+    <!-- Debugging -->
+    <script>
+        // Create a small debug tool
+        function createDebugInfo() {
+            const debugDiv = document.createElement('div');
+            debugDiv.style.position = 'absolute';
+            debugDiv.style.top = '5px';
+            debugDiv.style.left = '5px';
+            debugDiv.style.backgroundColor = 'rgba(0,0,0,0.7)';
+            debugDiv.style.color = 'white';
+            debugDiv.style.padding = '5px';
+            debugDiv.style.fontSize = '12px';
+            debugDiv.style.zIndex = '1000';
+            debugDiv.style.display = 'none'; // Hidden by default
+            
+            document.body.appendChild(debugDiv);
+            
+            // Add a toggle key (press D to show/hide)
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'd' || e.key === 'D') {
+                    debugDiv.style.display = debugDiv.style.display === 'none' ? 'block' : 'none';
+                }
+            });
+            
+            return {
+                log: function(message) {
+                    debugDiv.innerHTML = message + '<br>' + debugDiv.innerHTML.substring(0, 500);
+                    console.log(message);
+                },
+                clear: function() {
+                    debugDiv.innerHTML = '';
+                }
+            };
+        }
+        
+        // Create debug tool
+        window.debug = createDebugInfo();
+        
+        // Modified debug init function
+        function debugInit() {
+            try {
+                window.debug.log("Starting debug initialization...");
+                
+                // Test THREE.js availability
+                if (typeof THREE === 'undefined') {
+                    throw new Error("THREE is not defined! Three.js library not loaded correctly.");
+                }
+                window.debug.log("THREE is available");
+                
+                // Test container
+                const container = document.getElementById('canvas-container');
+                if (!container) {
+                    throw new Error("Canvas container not found in DOM!");
+                }
+                window.debug.log("Canvas container found: " + container.clientWidth + "x" + container.clientHeight);
+                
+                // Clear any existing content
+                while (container.firstChild) {
+                    if (container.firstChild.id !== 'game-message') {
+                        container.removeChild(container.firstChild);
+                    } else {
+                        break;
+                    }
+                }
+                
+                // Initialize scene with a simple test cube
+                const testScene = new THREE.Scene();
+                testScene.background = new THREE.Color(0x2c3e50);
+                
+                const containerWidth = container.clientWidth || window.innerWidth;
+                const containerHeight = container.clientHeight || (window.innerHeight - 75);
+                
+                window.debug.log("Using dimensions: " + containerWidth + "x" + containerHeight);
+                
+                const testCamera = new THREE.PerspectiveCamera(
+                    60, containerWidth / containerHeight, 0.1, 1000
+                );
+                testCamera.position.set(0, 0, 10);
+                
+                const testRenderer = new THREE.WebGLRenderer({ antialias: true });
+                testRenderer.setSize(containerWidth, containerHeight);
+                container.appendChild(testRenderer.domElement);
+                
+                // Add a red cube to verify rendering
+                const geometry = new THREE.BoxGeometry(3, 3, 3);
+                const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+                const cube = new THREE.Mesh(geometry, material);
+                testScene.add(cube);
+                
+                // Render the cube once
+                testRenderer.render(testScene, testCamera);
+                window.debug.log("Debug cube rendered successfully");
+                
+                // Clean up
+                setTimeout(() => {
+                    container.removeChild(testRenderer.domElement);
+                    window.debug.log("Debug renderer cleaned up");
+                    
+                    // Start the actual game
+                    init();
+                }, 100);
+            } catch (error) {
+                console.error("Debug initialization failed:", error);
+                document.getElementById('canvas-container').innerHTML = 
+                    `<div style="color:white;padding:20px;">Error: ${error.message}</div>`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOM loaded, running debug first...");
+            // Run debug initialization first
+            debugInit();
+        });
+    </script>
+    
+    <!-- Main game script (load last) -->
+    <script src="js/main.js"></script>
+    
+    <!-- Troubleshooting tool - load last -->
+    <script src="js/troubleshoot.js"></script>
+</body>
+</html>
