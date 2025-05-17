@@ -1,0 +1,355 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+}
+
+html, body {
+    overflow: hidden;
+    height: 100%;
+}
+
+#game-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#canvas-container {
+    flex: 1;
+    position: relative;
+    width: 100%;
+    height: calc(100% - 75px); /* Fixed height calculation */
+    overflow: hidden;
+}
+
+#canvas-container canvas {
+    display: block;
+    width: 100% !important; /* Force full width */
+    height: 100% !important; /* Force full height */
+}
+
+#ui-container {
+    background-color: #2c3e50;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    height: 45px; /* Fixed height */
+    width: 100%;
+    box-sizing: border-box;
+    border-top: 2px solid #34495e;
+    position: relative;
+    z-index: 100;
+}
+
+#game-status, #game-controls {
+    display: flex;
+    align-items: center;
+}
+
+#game-status h2 {
+    margin: 0 20px 0 0;
+}
+
+#game-status p {
+    margin: 0 15px;
+}
+
+#game-message {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    display: none;
+    z-index: 100;
+}
+
+#game-message.error {
+    background-color: rgba(231, 76, 60, 0.8);
+}
+
+#game-message.info {
+    background-color: rgba(52, 152, 219, 0.8);
+}
+
+button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background-color 0.3s;
+    white-space: nowrap;
+    min-width: 90px;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+.player-select, .ai-controls {
+    margin: 0 10px;
+}
+
+select {
+    background-color: #34495e;
+    color: white;
+    padding: 5px;
+    border: none;
+    border-radius: 4px;
+}
+
+/* Help modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #34495e;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 700px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 20px;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #bdc3c7;
+}
+
+.close-modal:hover {
+    color: #ecf0f1;
+}
+
+.instructions {
+    margin-top: 20px;
+}
+
+.instruction-section {
+    margin-bottom: 20px;
+}
+
+.instruction-section h3 {
+    color: #3498db;
+    border-bottom: 1px solid #3498db;
+    padding-bottom: 5px;
+}
+
+.instruction-section ul {
+    padding-left: 20px;
+}
+
+.instruction-section li {
+    margin: 10px 0;
+}
+
+.key-combo {
+    background-color: #2c3e50;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: monospace;
+}
+
+/* Add troubleshooting styles */
+.hidden {
+    display: none !important;
+}
+
+.visible {
+    display: flex !important;
+}
+
+/* Mode toggle button styles */
+.mode-button {
+    position: relative;
+    padding: 10px 15px 10px 35px;
+    min-width: 150px;
+    font-weight: bold;
+}
+
+.mode-button:before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+}
+
+.mode-button.move {
+    background-color: #3498db;
+}
+
+.mode-button.move:before {
+    background-color: #2980b9;
+}
+
+.mode-button.wall {
+    background-color: #e74c3c;
+}
+
+.mode-button.wall:before {
+    background-color: #c0392b;
+}
+
+#mode-indicator {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    margin-right: 15px;
+}
+
+.mode-move {
+    background-color: #3498db;
+    color: white;
+}
+
+.mode-wall {
+    background-color: #e74c3c;
+    color: white;
+}
+
+/* Wall orientation controls - improved visibility */
+#wall-orientation-controls {
+    display: none;
+    position: fixed; /* Change from absolute to fixed for better positioning */
+    top: 70px;
+    right: 20px;
+    background-color: rgba(0, 0, 0, 0.8); /* Darker background for better visibility */
+    padding: 15px;
+    border-radius: 8px;
+    flex-direction: column;
+    align-items: center;
+    z-index: 500; /* Increase z-index to ensure visibility */
+    border: 2px solid #3498db; /* Add border for better visibility */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+#wall-orientation-controls h3 {
+    margin: 0 0 10px 0;
+    color: white;
+    font-size: 16px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.wall-btn-container {
+    display: flex;
+    gap: 15px;
+}
+
+.wall-orientation-btn {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #34495e;
+    border: 3px solid #2c3e50;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.wall-orientation-btn:hover {
+    background-color: #2c3e50;
+    transform: scale(1.05);
+}
+
+.wall-orientation-btn.active {
+    background-color: #e74c3c;
+    border-color: #ffffff;
+    transform: scale(1.1);
+}
+
+.wall-orientation-btn .icon {
+    width: 35px;
+    height: 35px;
+    position: relative;
+}
+
+#horizontal-wall .icon::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 10px;
+    background-color: white;
+    transform: translateY(-50%);
+}
+
+#vertical-wall .icon::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 10px;
+    background-color: white;
+    transform: translateX(-50%);
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 992px) {
+    #game-controls {
+        flex-wrap: wrap;
+    }
+    
+    button, .player-select, .ai-controls {
+        margin-bottom: 5px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    #ui-container {
+        height: auto;
+        flex-direction: column;
+        padding: 10px;
+    }
+    
+    #game-status, #game-controls {
+        width: 100%;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    
+    #canvas-container {
+        height: calc(100% - 130px);
+    }
+}

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Quoridor - Debug</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            overflow: hidden;
+        }
+
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        #canvas-container {
+            flex: 1;
+            background-color: #34495e; /* To verify container is visible */
+            width: 100%;
+            position: relative;
+        }
+
+        #ui-container {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="canvas-container"></div>
+        <div id="ui-container">
+            <div>UI Bar is visible</div>
+        </div>
+    </div>
+
+    <!-- Three.js Library - Updated versions -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r132/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <!-- Debug Script -->
+    <script>
+        // Simple Three.js setup for debugging
+        let scene, camera, renderer;
+        
+        function init() {
+            console.log("Initializing Three.js...");
+            
+            // Check if Three.js is loaded
+            if (typeof THREE === 'undefined') {
+                console.error("Three.js is not loaded!");
+                document.getElementById('canvas-container').innerHTML = 
+                    "<p style='color:white;padding:20px;'>Error: Three.js library not loaded!</p>";
+                return;
+            }
+            
+            // Create scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x2c3e50);
+            
+            // Create camera
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 0, 10);
+            
+            // Create renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight * 0.9);
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+            
+            // Add a simple cube to verify rendering
+            const geometry = new THREE.BoxGeometry(3, 3, 3);
+            const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+            const cube = new THREE.Mesh(geometry, material);
+            scene.add(cube);
+            
+            // Add a light
+            const light = new THREE.DirectionalLight(0xffffff, 1);
+            light.position.set(10, 10, 10);
+            scene.add(light);
+            
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+                cube.rotation.x += 0.01;
+                cube.rotation.y += 0.01;
+                renderer.render(scene, camera);
+            }
+            
+            animate();
+            console.log("Three.js initialized successfully");
+        }
+        
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
