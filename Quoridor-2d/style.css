@@ -1,0 +1,514 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap');
+
+:root {
+    --global-height: 65vh;
+    --main-bg: linear-gradient(135deg, #f7cac9 0%, #92a8d1 100%);
+    --board-bg: #f8fafc;
+    --square-bg: #e3e8ee;
+    --wall-color: #ffd6a5;
+    --pawn-bleu: #6ec1e4;
+    --pawn-rouge: #f67280;
+    --pawn-vert: #7ed957;
+    --pawn-violet: #b39ddb;
+    --shadow: 0 4px 24px rgba(0,0,0,0.12);
+    --radius: 18px;
+    --font: 'Quicksand', Arial, sans-serif;
+}
+
+/* Compatibilité ancienne structure */
+*,*::before,*::after {
+    box-sizing: border-box;
+}
+
+body {
+    overflow-y: hidden; /* Empêche la scrollbar verticale */
+    width: 100vw;
+    height: 100vh;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    background: var(--main-bg);
+    color: #333;
+    font-family: var(--font);
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background 1s;
+    animation: bgmove 10s infinite alternate;
+}
+
+@keyframes bgmove {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+}
+
+/* Anciennes classes pour compatibilité, mais inutilisées avec le nouveau style */
+.rouge, .bleu {
+    background: none !important;
+}
+
+/* Plateau principal */
+.global {
+    margin-top: 15px;
+
+    border: none;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    background: var(--board-bg);
+    width: var(--global-height);
+    height: var(--global-height);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.walls-horizon-container {
+    width: 48px;                /* Largeur fixe pour bien centrer les murs verticaux */
+    height: 80%;
+    border: none;
+    position: absolute;
+    display: flex;
+    flex-direction: column;     /* Utilise flex-direction au lieu de flex-flow */
+    align-items: center;
+    justify-content: center;    /* Centre verticalement les murs */
+    padding-bottom: 0;
+    top: 10%;
+    background: none;
+    gap: 6px;
+    left: 0;                    /* Pour walls3 (gauche), à ajuster pour walls4 (droite) */
+    right: auto;
+}
+
+#walls3 {
+    left: auto;
+    right: 0px;
+    padding-left: 8px;
+}
+#walls4 {
+    padding-right: 8px;
+}
+
+.walls-list-item, .walls-list-horizon {
+    background: var(--wall-color);
+    border-radius: 6px;
+    opacity: 1;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.10);
+    border: none;
+}
+/* Conteneurs de murs */
+.walls-container {
+    width: 100%;
+    height: 48px;
+    min-height: 48px;
+    max-height: 48px;
+    border: none;
+    position: relative;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: center; /* Centre horizontalement */
+    background: none;
+    gap: 6px; /* Utilise gap pour l'espacement entre murs */
+    padding-left: 0;
+    padding-right: 0;
+    box-sizing: border-box;
+}
+
+/* Murs restants verticaux */
+.walls-list-item {
+    width: 12px;
+    height: 32px;
+    min-width: 12px;
+    min-height: 32px;
+    margin-right: 0;
+    flex-shrink: 0;
+}
+
+/* Murs restants horizontaux */
+.walls-list-horizon {
+    width: 32px;
+    height: 12px;
+    min-width: 32px;
+    min-height: 12px;
+    margin-top: 0;
+    flex-shrink: 0;
+}
+.walls-list-item:last-child {
+    margin-right: 0px;
+}
+
+/* Plateau de jeu */
+.squares-container {
+    width: 80%;
+    height: 80%;
+    border: none;
+    margin: auto;
+    padding-right: 1.11%;
+    padding-bottom: 1.11%;
+    display: flex;
+    flex-flow: row wrap;
+    position: relative;
+    background: transparent;
+    border-radius: var(--radius);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    z-index: 2;
+}
+
+/* Cases */
+.square {
+    width: 10%;
+    height: 10%;
+    margin-top: 1.11%;
+    margin-left: 1.11%;
+    border-radius: 12px;
+    background: var(--square-bg);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #c9d6e3;
+    background-repeat: no-repeat !important;
+    background-size: cover !important;
+}
+
+.square:hover {
+    background: #ffe082;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+}
+
+/* Pions en CSS */
+.square[data-pawn]::after {
+    content: '';
+    display: block;
+    width: 60%;
+    height: 60%;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    margin: auto;
+}
+
+.square[data-pawn="bleu"]::after { background: var(--pawn-bleu); }
+.square[data-pawn="rouge"]::after { background: var(--pawn-rouge); }
+.square[data-pawn="vert"]::after { background: var(--pawn-vert); }
+.square[data-pawn="violet"]::after { background: var(--pawn-violet); }
+
+/* Murs */
+.vertical-wall, .horizontal-wall {
+    border-radius: 6px;
+    position: absolute;
+    opacity: 0.7;
+    transition: opacity 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.10);
+    z-index: 3;
+    border: none;
+}
+
+.vertical-wall {
+    width: 1.11%;
+    height: 21.11%;
+}
+
+.horizontal-wall {
+    height: 1.11%;
+    width: 21.11%;
+}
+
+.vertical-wall:hover, .horizontal-wall:hover, .stay-visible {
+    opacity: 1 !important;
+    box-shadow: 0 2px 12px var(--wall-color);
+    background: var(--wall-color) !important;
+}
+
+.stay-visible:hover {
+    opacity: 1 !important;
+}
+
+/* Classes pour les murs temporaires lors de la vérification */
+.temp-wall-right {
+    border-right: 5px solid rgba(255, 0, 0, 0.0) !important; /* invisible mais compté dans les vérifications */
+}
+
+.temp-wall-left {
+    border-left: 5px solid rgba(255, 0, 0, 0.0) !important;
+}
+
+.temp-wall-top {
+    border-top: 5px solid rgba(255, 0, 0, 0.0) !important;
+}
+
+.temp-wall-bottom {
+    border-bottom: 5px solid rgba(255, 0, 0, 0.0) !important;
+}
+
+/* Colonnes et lignes (compatibilité) */
+.column-1 { left: 11%; }
+.column-2 { left: 22%; }
+.column-3 { left: 33%; }
+.column-4 { left: 43.95%; }
+.column-5 { left: 54.9%; }
+.column-6 { left: 65.8%; }
+.column-7 { left: 76.7%; }
+.column-8 { left: 87.6%; }
+
+.row-1 { top: 11%; }
+.row-2 { top: 22%; }
+.row-3 { top: 33%; }
+.row-4 { top: 43.95%; }
+.row-5 { top: 54.9%; }
+.row-6 { top: 65.8%; }
+.row-7 { top: 76.7%; }
+.row-8 { top: 87.6%; }
+
+.contenu{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* UI */
+/* Ajoute ou modifie dans style.css */
+.info-wrapper {
+    margin-top: 10px;
+    width: 400px; /* Largeur fixe, ajuste si besoin */
+    min-width: 400px;
+    max-width: 400px;
+    text-align: center;
+    background: rgba(255,255,255,0.7);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    padding: 18px 32px;
+    box-sizing: border-box;
+    transition: width 0.2s;
+}
+
+.info-wrapper h1 {
+    font-size: 2.1rem;
+    margin: 0 0 8px 0;
+    font-weight: 700;
+    color: #444;
+}
+
+.info-wrapper p {
+    font-size: 1.1rem;
+    margin: 0 0 10px 0;
+    color: #555;
+}
+
+.buttons-wrapper {
+    margin: 12px 0 0 0;
+}
+
+
+button {
+    font-family: var(--font);
+    font-size: 1rem;
+    color: #fff;
+    background: linear-gradient(90deg, #6ec1e4 0%, #b39ddb 100%);
+    border: none;
+    border-radius: 20px;
+    padding: 8px 22px;
+    margin: 0 4px 8px 0;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    outline: none;
+}
+
+button:hover {
+    background: linear-gradient(90deg, #f67280 0%, #7ed957 100%);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+button:active {
+    background: #ffe082;
+    color: #222;
+}
+
+.walls-set {
+    font-style: italic;
+    background: linear-gradient(90deg, #ffd6a5 0%, #f7cac9 100%);
+    color: #333;
+}
+
+.buttons-wrapper>button {
+    display: inline-block;
+}
+
+.crougeits {
+    position: absolute;
+    margin: 0px;
+    top: auto;
+    left: auto;
+    bottom: 0px;
+    right: 0px;
+    font-size: 0.8rem;
+    padding: 5px;
+    color: #888;
+    background: rgba(255,255,255,0.6);
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    z-index: 10;
+}
+
+/* Ancien fond flouté, masqué pour le nouveau style */
+.background-div {
+    display: none !important;
+}
+
+/* Ancien lien github, masqué pour le nouveau style */
+.github-link {
+    display: none !important;
+}
+
+/* Modal victoire stylée */
+.modal {
+    display: flex;
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0; width: 100vw; height: 100vh;
+    background: rgba(60,60,80,0.25);
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.modal-content {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    padding: 36px 48px 32px 48px;
+    text-align: center;
+    min-width: 280px;
+    max-width: 90vw;
+    animation: popIn 0.3s;
+}
+@keyframes popIn { from { transform: scale(0.8); } to { transform: scale(1); } }
+
+.modal-content h2 {
+    margin: 0 0 18px 0;
+    font-size: 2rem;
+    color: #444;
+    font-family: 'Quicksand', Arial, sans-serif;
+}
+
+.close {
+    position: absolute;
+    right: 32px;
+    top: 24px;
+    font-size: 2rem;
+    color: #aaa;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.close:hover { color: #f67280; }
+
+#win-reload {
+    margin-top: 18px;
+    background: linear-gradient(90deg, #6ec1e4 0%, #b39ddb 100%);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 32px;
+    font-size: 1.1rem;
+    font-family: 'Quicksand', Arial, sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: background 0.2s, color 0.2s;
+}
+#win-reload:hover {
+    background: linear-gradient(90deg, #f67280 0%, #7ed957 100%);
+}
+
+/* Modal règles du jeu */
+#rules-modal {
+    display: flex;
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0; width: 100vw; height: 100vh;
+    background: rgba(60,60,80,0.25);
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s;
+}
+
+#rules-modal .modal-content {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    padding: 36px 48px 32px 48px;
+    text-align: center;
+    min-width: 280px;
+    max-width: 90vw;
+    animation: popIn 0.3s;
+}
+
+#rules-modal .modal-content h2 {
+    margin: 0 0 18px 0;
+    font-size: 2rem;
+    color: #444;
+    font-family: 'Quicksand', Arial, sans-serif;
+}
+
+#rules-modal .modal-content p {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 18px;
+}
+
+#rules-modal .close {
+    position: absolute;
+    right: 32px;
+    top: 24px;
+    font-size: 2rem;
+    color: #aaa;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+#rules-modal .close:hover {
+    color: #f67280;
+}
+
+#rules-ok {
+    margin-top: 18px;
+    background: linear-gradient(90deg, #6ec1e4 0%, #b39ddb 100%);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 32px;
+    font-size: 1.1rem;
+    font-family: 'Quicksand', Arial, sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: background 0.2s, color 0.2s;
+}
+
+#rules-ok:hover {
+    background: linear-gradient(90deg, #f67280 0%, #7ed957 100%);
+}
+
+/* Highlight legal squares for movement */
+.square.legal-move {
+    background: #b3e5fc; /* Light blue for highlighting */
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+
+.square.legal-move:hover {
+    background: #81d4fa; /* Slightly darker blue on hover */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}

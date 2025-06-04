@@ -1,0 +1,195 @@
+Voici un aperçu détaillé de la structure du projet Quoridor en JavaScript, en mettant en avant l’organisation des fichiers, les rôles de chaque module et la logique de fonctionnement du jeu.
+
+────────────────────────────────────────────────────────────────────
+1) Aperçu général des fichiers et de l’architecture
+────────────────────────────────────────────────────────────────────
+
+Le projet est organisé de manière modulaire autour de plusieurs fichiers JavaScript, chacun ayant une responsabilité distincte :
+
+• index.html : La page principale du jeu, qui inclut notamment la structure HTML et la feuille de style (style.css). C’est ici que les éléments d’interface (boutons, conteneur du plateau) se trouvent.  
+• style.css : Les styles liés à l’apparence du jeu (placement du plateau, couleurs, apparence des pions, murs, modale de victoire, etc.).  
+• gameBoard.js : Responsable de la génération du plateau (les cases, l’emplacement initial des pions, la génération de murs sous forme d’objets cliquables, etc.) et de l’initialisation de l’état du jeu.  
+• playerMovement.js : Contient la logique des déplacements des pions : comment repérer les mouvements possibles, comment gérer le saut par-dessus un pion, etc.  
+• gameUtil.js : Fournit un ensemble de fonctions utilitaires (gestion du nombre de joueurs, détection de la victoire, mise à jour du localStorage, sélection du joueur suivant, etc.).  
+• config.js : Centralise la configuration du jeu (par exemple, ligne(s) de victoire selon la couleur, nombre de murs par joueur, positions initiales, etc.).  
+• ai.js : Met en place l’IA rudimentaire pour le mode 1 joueur (joueur rouge contrôlé par IA).  
+• wall.js : Gère l’ajout (vertical ou horizontal) et le placement des murs sur le plateau, ainsi que la vérification qu’aucun joueur n’est totalement bloqué.  
+• square.js : Gère la création des cases (squares) sur le plateau et la logique pour déplacer un pion d’une case à une autre.  
+• uiElements.js : Regroupe des fonctions liées à l’interface utilisateur (par exemple, la fenêtre modale ou les messages d’erreur).  
+• gameLogic.js : Contient la fonction nextPlayer (même si elle est également redéfinie dans gameUtil.js). C’est un module léger qui se concentre sur la logique de tour d’un joueur à un autre.
+
+Le gameplay est centré autour du fichier index.html (pour la vue) et app.js (pour le script principal qui importe tous les modules). App.js n’est pas listé dans l’extrait, mais c’est généralement le point d’entrée qui appelle les fonctions d’initialisation (generateBoard, initializeGameState, etc.).
+
+────────────────────────────────────────────────────────────────────
+2) Le plateau de jeu (gameBoard.js)
+────────────────────────────────────────────────────────────────────
+
+• adjustBoardSize() :  
+  – Cette fonction adapte la taille du plateau principal (l’élément .global) en fonction des dimensions de la fenêtre (window.innerWidth / window.innerHeight).  
+  – Si la fenêtre est plus haute que large, on définit la taille en % de la largeur (vw) ; sinon on la définit en % de la hauteur (vh).  
+
+• generateBoard() :  
+  – Crée les 81 cases du plateau en appelant SquareModule.createSquare(i+1). Chaque case est un <div> avec un id du type "sq1", "sq2", …, "sq81".  
+  – Génère aussi des murs virtuels (au sens “positions de murs”). Le code parcourt deux boucles for pour créer successivement les murs verticaux et horizontaux :  
+     ▸ createWall(1, "1.11%", "vertical", j) pour le 1er mur de chaque colonne (ou ligne), puis createWall(i+1, i*10*1.11+'%', "vertical", j) pour les autres.  
+     ▸ Idem pour les murs horizontaux.  
+  – Ainsi se forme un “grillage” de positions murales autour et entre les cases.
+
+• initializeGameState(showPossibleMoves) :  
+  – Détecte le nombre de joueurs (numOfPlayers) depuis window.numOfPlayers (ou localStorage).  
+  – Positionne les pions sur les cases de départ :  
+     ▸ pion rouge sur la case "sq5".  
+     ▸ pion bleu sur la case "sq77".  
+     ▸ pion vert sur "sq45".  
+     ▸ pion violet sur "sq37".  
+  – Si on joue à 1 ou 2 joueurs, le code supprime les pions verts et violets (removeAttribute('data-pawn')). À 3, on retire seulement le pion violet.  
+  – Gère la visibilité des murs (walls3, walls4) : certains murs (pour les joueurs 3 et 4) sont cachés si l’on joue à 1 ou 2 joueurs.  
+  – Crée l’interface de mur (createWallList) : pour chaque joueur, un lot de murs affichés sur les côtés ou en haut/bas. Le nombre de murs à l’écran dépend de la variable numberOfWalls (souvent 10 ou 5 si 4 joueurs).  
+  – Assigne un onclick à chaque mur du plateau : lorsqu’on clique, on appelle addVerticalWall ou addHorizontalWall pour essayer de le placer. Après chaque placement, on appelle showPossibleMoves(window.tour).  
+  – Fait un “tirage au sort” du premier joueur (GameUtilModule.prizeDraw()).  
+  – Appelle showPossibleMoves pour que le premier joueur puisse déplacer son pion.  
+  – Met à jour le texte d’information (“Au tour du pion X de jouer”).
+
+────────────────────────────────────────────────────────────────────
+3) Les déplacements de pions (playerMovement.js)
+────────────────────────────────────────────────────────────────────
+
+• showPossibleMoves(color) :  
+  – Supprime d’abord tous les indicateurs de mouvement (clearMoveDots()).  
+  – Ne montre pas les déplacements possibles pour l’IA (le pion rouge dans le mode 1 joueur). Si on est en mode 1 joueur (window.numOfPlayers == 1) et que color == 'rouge', on ne fait rien.  
+  – Détermine la case actuelle du pion color (window.previousSquare[color]). Analyse ensuite les cases adjacentes et regarde s’il y a un mur.  
+  – Pour chaque direction (haut, bas, gauche, droite), vérifie :  
+     ▸ s’il n’y a pas de mur bloquant.  
+     ▸ si la case-objectif est occupée par un autre pion, alors on teste s’il est possible de sauter par-dessus (jump).  
+  – Ajoute un petit point jaune (un <div> .move-dot) dans les cases où le pion color peut aller.
+
+• clearMoveDots() :  
+  – Supprime tous les éléments .move-dot qui indiquent les déplacements possibles.
+
+• setupSquareClickEvents(movePawn, checkIfWon, nextPlayer) :  
+  – Parcourt toutes les .square du plateau :  
+     ▸ Au clic, si la case cliquée est un déplacement valide (isValidMove) et qu’elle n’a pas de pion data-pawn, on déplace le pion actif (movePawn), puis on vérifie si ce déplacement procure la victoire (checkIfWon). On enchaîne avec nextPlayer().  
+
+• isValidMove(color, targetSquareId) :  
+  – Vérifie si la case targetSquareId est adjacente (pas de mur, distance ±1 ou ±9) ou si c’est un saut par-dessus un pion (canJumpOver).  
+
+• canJumpOver(color, targetSquareId) :  
+  – Calcule la case intermédiaire (intermediateSquare) selon la direction du saut (+2, -2, +18, -18).  
+  – Vérifie qu’il y a un pion au milieu et pas de mur bloquant.  
+  – Indique true si le saut est réalisable, false sinon.
+
+────────────────────────────────────────────────────────────────────
+4) Le placement des murs (wall.js)
+────────────────────────────────────────────────────────────────────
+
+• createWall(idCount, topLeft, side, rowColumn) :  
+  – Crée un <div> représentant un emplacement de mur : .vertical-wall ou .horizontal-wall.  
+  – Place ce mur dans .squares-container à des coordonnées calculées par topLeft (et la classe row- / column- correspondante).
+
+• createWallList(targetId, horizon) :  
+  – Crée l’élément “visual” du mur dans la réserve de murs (id walls1, walls2, etc.).  
+  – Si horizon == true => c’est un mur horizontal miniature, sinon vertical.
+
+• addVerticalWall / addHorizontalWall :  
+  – Quand le joueur clique sur un emplacement potentiel pour un mur, ces fonctions vérifient :  
+     ▸ la disponibilité du mur dans le stock de murs du joueur (wallCount[color] > 0).  
+     ▸ qu’on ne se chevauche pas avec un mur déjà visible (stay-visible).  
+     ▸ qu’on ne croise pas un autre mur perpendiculaire déjà visible.  
+     ▸ surtout, qu’on ne bloque pas complètement un joueur (via canPlaceVerticalWall ou canPlaceHorizontalWall, qui ajoutent temporairement un mur puis simulent la traversée).  
+  – Si tout est conforme, la classe 'stay-visible' est ajoutée à l’emplacement. On marque la case comme ayant un “wall-right” ou “wall-bottom” pour empêcher de passer. Puis on décrémente le stock de murs du joueur.
+
+• canPlaceVerticalWall / canPlaceHorizontalWall :  
+  – Ajoute temporairement une classe “temp-wall-right” (ou “temp-wall-bottom”), puis appelle checkAllPlayersHavePathWithTempWalls() pour s’assurer que tous les joueurs peuvent encore rejoindre leur ligne d’arrivée.  
+  – Si c’est impossible, on retire ces classes et on affiche un message d’erreur (showBlockingWallMessage).
+
+• checkAllPlayersHavePathWithTempWalls & checkPathExistsWithTempWalls :  
+  – Utilisent un algorithme BFS (parcours en largeur) pour tester si chaque pion (pour chaque couleur active) peut atteindre sa ligne d’arrivée malgré les murs temporaires.
+
+────────────────────────────────────────────────────────────────────
+5) Fonctions utilitaires, configuration et IA
+────────────────────────────────────────────────────────────────────
+
+• config.js :  
+  – initLocalStorage() : Initialise localStorage si le nombre de joueurs ("numberOfPlayers") ou le nombre de murs ("numberOfWalls") n’est pas encore défini.  
+  – getNumOfPlayers() : Récupère le nombre de joueurs depuis localStorage.  
+  – line : quatre objets (first, second, third, fourth) qui listent les ID des cases correspondantes aux lignes de victoire pour chaque couleur (bleu, rouge, vert, violet).  
+  – initialPositions : positions par défaut des pions.  
+  – getWallCount() : renvoie le stock de murs initial pour chaque joueur.
+
+• gameUtil.js :  
+  – getNb(prefix, id) : Extrait un nombre depuis un id (par exemple getNb("sq", "sq15") => 15).  
+  – switchNumOfPlayers(value) : Change le nombre de joueurs dans le localStorage, puis reload la page.  
+  – checkIfWon(color) : Regarde si le pion color est arrivé sur sa ligne de victoire (tableaux line.first, line.second, etc.).  
+  – showWinBox(color) : Affiche la modale de victoire.  
+  – showBlockingWallMessage() : Affiche la modale “Placement interdit” si un mur bloque totalement un joueur.  
+  – randomInt(min, max) : Nombre aléatoire parmi [min..max].  
+  – click(selector) : Simule un clic sur un élément (utilisé par l’IA).  
+  – nextPlayer() : Change la variable globale tour vers la couleur suivante (logique similaire à gameLogic.js). Met à jour l’affichage du tour.  
+  – prizeDraw() : Tirage au sort du premier joueur.
+
+• ai.js :  
+  – initializeAI() : Configure le mode 1 joueur si numOfPlayers == 1. Installe un setInterval qui fait jouer automatiquement le pion rouge.  
+  – L’IA dans l’exemple se contente de vérifier s’il peut avancer vers le bas ou à droite, ou bien placer un mur aléatoirement. Le code n’est pas très élaboré, mais il montre la possibilité d’automatiser des déplacements.
+
+• square.js :  
+  – createSquare(idCount) : Crée un <div> class="square" avec un id unique "sqX".  
+  – returnCurrentSquare(color) : Retourne la case (élément) où se trouve le pion de la couleur color.  
+  – movePawn(color, target) : Retire le pion color de sa case précédente (previousSquare[color]) et le place sur la case target (data-pawn="color").
+
+• uiElements.js :  
+  – showCannotMoveOnPawnMsg() : Affiche une fenêtre modale quand un joueur essaye de se déplacer sur une case déjà occupée par un pion.  
+  – updateTurnDisplay(tour) : Met à jour le texte “Au tour du pion X de jouer”.
+
+• gameLogic.js :  
+  – nextPlayer(numOfPlayers) : Une version un peu différente de nextPlayer(), qui fait le basculement du tour selon le nombre de joueurs. (Il y a un léger doublon avec gameUtil.js.)
+
+────────────────────────────────────────────────────────────────────
+6) Logique globale du jeu au lancement
+────────────────────────────────────────────────────────────────────
+
+1. Au chargement (dans index.html), le script app.js (non visible ici mais qui importe tout) appelle principalement :  
+   • config.initLocalStorage() pour paramétrer localStorage.  
+   • gameBoard.generateBoard() pour créer le plateau (81 cases + murs).  
+   • gameBoard.initializeGameState(showPossibleMoves) pour :  
+       – Mettre les pions sur leurs emplacements initiaux.  
+       – Gérer l’affichage des murs restants.  
+       – Ajouter les gestionnaires d’événement (click) pour les murs.  
+       – Lancer un tirage au sort du premier joueur.  
+       – Appeler showPossibleMoves() pour le pion qui commence.
+
+2. Lorsque le joueur clique sur une case :  
+   • playerMovement.setupSquareClickEvents() a installé un onclick sur chaque case.  
+   • isValidMove(...) vérifie si le pion peut s’y rendre (mouvement normal ou saut).  
+   • movePawn(...) exécute l’animation de déplacement.  
+   • checkIfWon(...) vérifie si ce pion atteint sa ligne de victoire.  
+   • nextPlayer(...) passe au joueur suivant et appelle showPossibleMoves(...) pour ce nouveau joueur.
+
+3. Lorsque le joueur clique sur un mur :  
+   • addVerticalWall ou addHorizontalWall essaient de le placer.  
+   • canPlaceVerticalWall/HorizontalWall vérifient si ce placement n’enferme pas un joueur.  
+   • Si OK, le mur devient permanent (stay-visible) et on décrémente le stock du mur pour ce joueur.
+
+4. La victoire survient dès qu’un pion atteint sa ligne d’arrivée (line.first pour bleu, line.second pour rouge, etc.). On affiche alors un message de félicitations.
+
+────────────────────────────────────────────────────────────────────
+7) Conclusion
+────────────────────────────────────────────────────────────────────
+
+– Le code est donc structuré autour de modules clairs :  
+  1. board & square : Répartition spatiale du plateau (cases, murs).  
+  2. wall : Création et placement de murs, avec validations pour ne pas bloquer définitivement un joueur.  
+  3. playerMovement : Gestion des déplacements, règles pour avancer ou sauter par-dessus.  
+  4. gameUtil & config : Fonctions diverses, gestion du localStorage, nombre de joueurs, tours de jeu, lignes de victoire.  
+  5. uiElements & gameLogic : Tout ce qui touche à l’interface utilisateur (modales, affichage) et organisation générale d’une partie.  
+  6. ai : Logique de base qui automatise le pion rouge pour un mode “1 joueur”.
+
+– En résumé, chaque fichier isole une partie de la logique du Quoridor, permettant de comprendre rapidement la responsabilité de chaque module. Les variables globales (tour, numOfPlayers, etc.) sont utilisées pour synchroniser l’état du jeu. Les murs et le plateau sont gérés via un maillage de “cases” et de “positions murales” pour éviter toute ambiguïté dans la détection de collisions (murs vs. pions).
+
+Ce code illustre donc les principales mécaniques de Quoridor :
+• La disposition du plateau (9x9 cases).  
+• Les règles de déplacement (pas de mur adjacent, saut possible si un pion est en face).  
+• Les règles de placement de murs (impossibilité d’enfermer un joueur).  
+• Le roulement des joueurs (en fonction du nombre de joueurs).  
+• La détection de victoire quand un pion atteint la ligne opposée.  
+
+Grâce à cette organisation modulaire, on peut aisément étendre certaines fonctionnalités ou ajouter de nouvelles règles (par exemple, améliorer l’algorithme d’IA) sans trop perturber le reste de l’application.
