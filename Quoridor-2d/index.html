@@ -8,7 +8,19 @@
     <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
 </head>
 <body>
-    
+
+
+    <div class="audio-controls">
+  <button onclick="document.getElementById('musique').play()">Lancer la musique</button>
+  <button onclick="document.getElementById('musique').pause()">Pause</button>
+</div>
+
+
+<audio id="musique" loop>
+  <source src="audio/forest-atmosphere-localization-poland-320813.mp3" type="audio/mpeg">
+</audio>
+
+
     <div class="contenu">
         <div class="info-wrapper">
             <p><b>Au tour du pion bleu de jouer</b><br>Mode selectionné : <i>1 joueur</i></p>

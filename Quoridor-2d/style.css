@@ -21,7 +21,7 @@
 }
 
 body {
-    overflow-y: hidden; /* Empêche la scrollbar verticale */
+    overflow-y: hidden;
     width: 100vw;
     height: 100vh;
     padding: 0;
@@ -30,7 +30,10 @@ body {
     display: flex;
     flex-flow: column nowrap;
     align-items: center;
-    background: var(--main-bg);
+    background-image: url("images/dessin.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
     color: #333;
     font-family: var(--font);
     min-height: 100vh;
@@ -38,6 +41,7 @@ body {
     transition: background 1s;
     animation: bgmove 10s infinite alternate;
 }
+
 
 @keyframes bgmove {
     0% { background-position: 0% 50%; }
@@ -511,4 +515,41 @@ button:active {
 .square.legal-move:hover {
     background: #81d4fa; /* Slightly darker blue on hover */
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: #0056b3;
+  }
+
+.audio-controls {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+  z-index: 1000;
+}
+
+.audio-controls button {
+  padding: 10px 15px;
+  font-size: 14px;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.audio-controls button:hover {
+  background-color: #0056b3;
 }
