@@ -487,7 +487,7 @@ button:active {
 
 #rules-ok {
     margin-top: 18px;
-    background: linear-gradient(90deg, #6ec1e4 0%, #b39ddb 100%);
+    background: linear-gradient(90deg, #42da1c 0%, #1dd1d1 100%);
     color: #fff;
     border: none;
     border-radius: 20px;
@@ -501,7 +501,7 @@ button:active {
 }
 
 #rules-ok:hover {
-    background: linear-gradient(90deg, #f67280 0%, #7ed957 100%);
+    background: linear-gradient(90deg, #42da1c 0%, #1dd1d1 100%);
 }
 
 /* Highlight legal squares for movement */
@@ -518,17 +518,22 @@ button:active {
 }
 
   button {
-    padding: 10px 20px;
-    font-size: 16px;
-    background: #007BFF;
-    color: white;
+    margin-top: 18px;
+    background: linear-gradient(90deg, #42da1c 0%, #1dd1d1 100%);
+    color: #fff;
     border: none;
-    border-radius: 8px;
+    border-radius: 20px;
+    padding: 10px 32px;
+    font-size: 1.1rem;
+    font-family: 'Quicksand', Arial, sans-serif;
+    font-weight: 700;
     cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: background 0.2s, color 0.2s;
   }
 
   button:hover {
-    background: #0056b3;
+    background: linear-gradient(90deg, #f67280 0%, #7ed957 100%);
   }
 
 .audio-controls {
