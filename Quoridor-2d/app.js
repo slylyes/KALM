@@ -67,7 +67,10 @@ Object.assign(window, {
 function nextPlayer() {
     GameLogic.nextPlayer(window.numOfPlayers);
     UIElements.updateTurnDisplay(window.tour);
-    PlayerMovement.showPossibleMoves(window.tour, window.previousSquare);
+    PlayerMovement.showPossibleMoves(window.tour);
+    
+    // Highlight the current player's walls
+    WallModule.highlightCurrentPlayerWalls(window.tour);
 }
 
 // Function to show the game rules modal

@@ -1,18 +1,31 @@
 // Gestion des mouvements des joueurs
 
 import * as GameUtilModule from './gameUtil.js';
+import * as WallModule from './wall.js';
 
 // Affiche les mouvements possibles pour un joueur
 export function showPossibleMoves(color) {
     clearMoveDots();
-    document.querySelectorAll('.square').forEach(sq => sq.classList.remove('legal-move')); // Clear previous highlights
+    document.querySelectorAll('.square').forEach(sq => {
+        sq.classList.remove('legal-move');
+        sq.classList.remove('current-player-square');
+    });
 
     // Ne colorie pas pour l'IA (mode 1 joueur)
     if (window.numOfPlayers == 1 && color == 'rouge') return;
 
     let prevSq = window.previousSquare[color];
     let prev = document.getElementById(prevSq);
+    
+    // Highlight the current player's square
+    if (prev) {
+        prev.classList.add('current-player-square');
+    }
+    
     let prevNum = GameUtilModule.getNb('sq', prevSq);
+
+    // Highlight the current player's walls
+    WallModule.highlightCurrentPlayerWalls(color);
 
     // Directions: [delta, wall on prev, wall on target]
     const directions = [

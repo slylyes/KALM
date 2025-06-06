@@ -20,6 +20,9 @@ export function returnCurrentSquare(color){
 export function movePawn(color, target) {
     let element = document.querySelector(target);
 
+    // Remove current-player-square class from all squares
+    document.querySelectorAll('.square').forEach(sq => sq.classList.remove('current-player-square'));
+
     // Retire le pion de la case précédente
     if (color == 'rouge') {
         document.getElementById(previousSquare.rouge).removeAttribute('data-pawn');
@@ -37,8 +40,12 @@ export function movePawn(color, target) {
 
     // Place le pion sur la nouvelle case
     element.setAttribute('data-pawn', color);
+    
+    // Add current-player-square class to the new square if it's the current player's turn
+    if (window.tour === color) {
+        element.classList.add('current-player-square');
+    }
 
     // Clear legal move highlights
     document.querySelectorAll('.square').forEach(sq => sq.classList.remove('legal-move'));
 }
-
