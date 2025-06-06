@@ -6,53 +6,6 @@
     <title>Quoridor</title>
     <link rel="stylesheet" href="style.css">
     <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
-    <style>
-        /* Player-colored walls */
-        .wall-rouge, .walls-list-item.wall-rouge, .walls-list-horizon.wall-rouge {
-            background-color: #ff6b6b !important;
-        }
-        .wall-bleu, .walls-list-item.wall-bleu, .walls-list-horizon.wall-bleu {
-            background-color: #6b9fff !important;
-        }
-        .wall-vert, .walls-list-item.wall-vert, .walls-list-horizon.wall-vert {
-            background-color: #6bff6b !important;
-        }
-        .wall-violet, .walls-list-item.wall-violet, .walls-list-horizon.wall-violet {
-            background-color: #d46bff !important;
-        }
-        
-        /* Highlight current player's square with background color */
-        .current-player-square {
-            background-color: rgba(255, 255, 0, 0.4) !important;
-            z-index: 2;
-        }
-        
-        /* Highlight current player's walls container with background color */
-        .active-walls {
-            background-color: rgba(255, 255, 0, 0.25) !important;
-            border: 2px solid rgba(255, 255, 0, 0.5) !important;
-            z-index: 2;
-        }
-        
-        /* Make placed walls more visible with player colors */
-        .vertical-wall.stay-visible, .horizontal-wall.stay-visible {
-            opacity: 0.9 !important;
-        }
-        
-        /* Ensure the pawn color is still visible on highlighted squares */
-        .square[data-pawn="rouge"].current-player-square::after {
-            background-color: #ff6b6b;
-        }
-        .square[data-pawn="bleu"].current-player-square::after {
-            background-color: #6b9fff;
-        }
-        .square[data-pawn="vert"].current-player-square::after {
-            background-color: #6bff6b;
-        }
-        .square[data-pawn="violet"].current-player-square::after {
-            background-color: #d46bff;
-        }
-    </style>
 </head>
 <body>
 
