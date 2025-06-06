@@ -7,12 +7,44 @@ import * as Config from './config.js';
 
 // Ajuste la taille du plateau en fonction de la fenêtre
 export function adjustBoardSize() {
-    if(window.innerWidth < window.innerHeight){
-        document.querySelector('.global').style.width = 65+'vw';
-        document.querySelector('.global').style.height = 65+'vw';
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    const infoWrapper = document.querySelector('.info-wrapper');
+    const infoHeight = infoWrapper ? infoWrapper.offsetHeight : 0;
+    const globalElement = document.querySelector('.global');
+    
+    // Définir une taille de base
+    let baseSize = '65vh';
+    
+    // Ajuster la taille selon la fenêtre
+    if (windowWidth < windowHeight) {
+        if (windowWidth < 576) {
+            baseSize = '80vw';
+        } else {
+            baseSize = '65vw';
+        }
     } else {
-        document.querySelector('.global').style.width = 65+'vh';
-        document.querySelector('.global').style.height = 65+'vh';
+        if (windowHeight < 600) {
+            // Pour les petites hauteurs, calculer l'espace disponible
+            const availableHeight = windowHeight - infoHeight - 30;
+            baseSize = Math.min(availableHeight * 0.9, windowWidth * 0.65) + 'px';
+        } else {
+            baseSize = '65vh';
+        }
+    }
+    
+    // Appliquer la taille
+    globalElement.style.width = baseSize;
+    globalElement.style.height = baseSize;
+    
+    // Assurer que le plateau ne dépasse pas la fenêtre
+    const boardRect = globalElement.getBoundingClientRect();
+    if (boardRect.bottom > windowHeight) {
+        const scale = (windowHeight - infoHeight - 20) / boardRect.height;
+        globalElement.style.transform = `scale(${Math.max(0.5, Math.min(1, scale))})`;
+        globalElement.style.transformOrigin = 'top center';
+    } else {
+        globalElement.style.transform = 'scale(1)';
     }
 }
 
@@ -38,6 +70,8 @@ export function generateBoard() {
             WallModule.createWall(i+1,i*10*1.11+'%','horizontal',j);
         }
     }
+
+    console.log("Board generation complete");
 }
 
 // Initialise l'état du jeu
@@ -114,6 +148,7 @@ export function initializeGameState(showPossibleMoves) {
 
     // Déterminer le premier joueur
     GameUtilModule.prizeDraw();
+    console.log("Game state initialized, showing possible moves for", window.tour);
     showPossibleMoves(window.tour); // Affiche les cercles au début
     document.querySelector('.info-wrapper>p>b').innerText = `Au tour du pion ${window.tour} de jouer`;
 }

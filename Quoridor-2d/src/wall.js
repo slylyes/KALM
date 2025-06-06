@@ -18,6 +18,23 @@ export function createWall(idCount, topLeft, side, rowColumn) {
 export function createWallList(targetId, horizon) {
     let wall = document.createElement('div');
     horizon ? wall.classList.add('walls-list-horizon') : wall.classList.add('walls-list-item');
+    
+    // Add color class based on the wall list container
+    let color = '';
+    if (targetId === 'walls1') {
+        color = 'rouge';
+        wall.classList.add('wall-rouge');
+    } else if (targetId === 'walls2') {
+        color = 'bleu';
+        wall.classList.add('wall-bleu');
+    } else if (targetId === 'walls3') {
+        color = 'vert';
+        wall.classList.add('wall-vert');
+    } else if (targetId === 'walls4') {
+        color = 'violet';
+        wall.classList.add('wall-violet');
+    }
+    
     document.querySelector(`#${targetId}`).appendChild(wall);
 }
 
@@ -63,19 +80,19 @@ export function addVerticalWall(vWl){
             }
 
             if(tour == 'bleu' && wallCount.bleu > 0){
-                verticalWall(vWl,first_square,second_square);
+                verticalWall(vWl, first_square, second_square, 'bleu');
                 removeWallFromWallList('bleu');
                 nextPlayer();
             } else if(tour == 'rouge' && wallCount.rouge > 0){
-                verticalWall(vWl,first_square,second_square);
+                verticalWall(vWl, first_square, second_square, 'rouge');
                 removeWallFromWallList('rouge');
                 nextPlayer();
             } else if(tour == 'vert' && wallCount.vert > 0){
-                verticalWall(vWl,first_square,second_square);
+                verticalWall(vWl, first_square, second_square, 'vert');
                 removeWallFromWallList('vert');
                 nextPlayer();
             } else if(tour == 'violet' && wallCount.violet > 0){
-                verticalWall(vWl,first_square,second_square);
+                verticalWall(vWl, first_square, second_square, 'violet');
                 removeWallFromWallList('violet');
                 nextPlayer();
             }
@@ -106,19 +123,19 @@ export function addHorizontalWall(hWl){
             }
 
             if(tour == 'bleu' && wallCount.bleu > 0){
-                horizontalWall(hWl,first_square,second_square);
+                horizontalWall(hWl, first_square, second_square, 'bleu');
                 removeWallFromWallList('bleu');
                 nextPlayer();
             } else if(tour == 'rouge' && wallCount.rouge > 0){
-                horizontalWall(hWl,first_square,second_square);
+                horizontalWall(hWl, first_square, second_square, 'rouge');
                 removeWallFromWallList('rouge');
                 nextPlayer();
             } else if(tour == 'vert' && wallCount.vert > 0){
-                horizontalWall(hWl,first_square,second_square);
+                horizontalWall(hWl, first_square, second_square, 'vert');
                 removeWallFromWallList('vert');
                 nextPlayer();
             } else if(tour == 'violet' && wallCount.violet > 0){
-                horizontalWall(hWl,first_square,second_square);
+                horizontalWall(hWl, first_square, second_square, 'violet');
                 removeWallFromWallList('violet');
                 nextPlayer();
             }
@@ -126,20 +143,41 @@ export function addHorizontalWall(hWl){
     }
 }
 
-export function verticalWall(vWl, first_square, second_square) {
+export function verticalWall(vWl, first_square, second_square, color) {
     document.querySelector(`#sq${first_square}`).classList.add('wall-right');
     document.querySelector(`#sq${second_square}`).classList.add('wall-right');
     vWl.classList.add('stay-visible');
+    vWl.classList.add(`wall-${color}`); // Add color class to the wall
     vWl.onclick = null;
     return true;
 }
 
-export function horizontalWall(hWl, first_square, second_square) {
+export function horizontalWall(hWl, first_square, second_square, color) {
     document.querySelector(`#sq${first_square}`).classList.add('wall-bottom');
     document.querySelector(`#sq${second_square}`).classList.add('wall-bottom');
     hWl.classList.add('stay-visible');
+    hWl.classList.add(`wall-${color}`); // Add color class to the wall
     hWl.onclick = null;
     return true;
+}
+
+// Highlight the current player's walls
+export function highlightCurrentPlayerWalls(color) {
+    // Remove highlight from all wall lists
+    document.querySelectorAll('.walls-container, .walls-horizon-container').forEach(container => {
+        container.classList.remove('active-walls');
+    });
+    
+    // Add highlight to the current player's wall list
+    let wallsId = '';
+    if (color === 'rouge') wallsId = '#walls1';
+    else if (color === 'bleu') wallsId = '#walls2';
+    else if (color === 'vert') wallsId = '#walls3';
+    else if (color === 'violet') wallsId = '#walls4';
+    
+    if (wallsId) {
+        document.querySelector(wallsId).classList.add('active-walls');
+    }
 }
 
 export function canPlaceVerticalWall(first_square, second_square) {
@@ -314,4 +352,3 @@ export function getWallsAbove(id){
 
     return theWallsAbove;
 }
-
