@@ -463,14 +463,14 @@ body {
    ========================= */
 /* Highlight legal squares for movement */
 .square.legal-move {
-    background: #b3e5fc;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    transition: background 0.2s, box-shadow 0.2s;
+    background: #b3e5fc !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+    cursor: pointer !important;
+    z-index: 10 !important;
 }
 .square.legal-move:hover {
-    background: #81d4fa;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    background: #81d4fa !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
 }
 
 /* =========================

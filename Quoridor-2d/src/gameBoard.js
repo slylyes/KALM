@@ -70,6 +70,8 @@ export function generateBoard() {
             WallModule.createWall(i+1,i*10*1.11+'%','horizontal',j);
         }
     }
+
+    console.log("Board generation complete");
 }
 
 // Initialise l'état du jeu
@@ -146,6 +148,7 @@ export function initializeGameState(showPossibleMoves) {
 
     // Déterminer le premier joueur
     GameUtilModule.prizeDraw();
+    console.log("Game state initialized, showing possible moves for", window.tour);
     showPossibleMoves(window.tour); // Affiche les cercles au début
     document.querySelector('.info-wrapper>p>b').innerText = `Au tour du pion ${window.tour} de jouer`;
 }
