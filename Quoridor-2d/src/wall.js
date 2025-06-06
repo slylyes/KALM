@@ -65,27 +65,19 @@ export function addVerticalWall(vWl){
             if(tour == 'bleu' && wallCount.bleu > 0){
                 verticalWall(vWl,first_square,second_square);
                 removeWallFromWallList('bleu');
-                tour = 'rouge'; // On passe la main au rouge
+                nextPlayer();
             } else if(tour == 'rouge' && wallCount.rouge > 0){
                 verticalWall(vWl,first_square,second_square);
                 removeWallFromWallList('rouge');
-                if(numOfPlayers == 3 || numOfPlayers == 4){
-                    tour = 'vert'; // On donne la main au vert
-                } else {
-                    tour = 'bleu'; // On donne la main au bleu
-                }
+                nextPlayer();
             } else if(tour == 'vert' && wallCount.vert > 0){
                 verticalWall(vWl,first_square,second_square);
                 removeWallFromWallList('vert');
-                if(numOfPlayers == 4){
-                    tour = 'violet';
-                } else {
-                    tour = 'bleu';
-                }
+                nextPlayer();
             } else if(tour == 'violet' && wallCount.violet > 0){
                 verticalWall(vWl,first_square,second_square);
                 removeWallFromWallList('violet');
-                tour = 'bleu';
+                nextPlayer();
             }
         }
     }
@@ -116,27 +108,19 @@ export function addHorizontalWall(hWl){
             if(tour == 'bleu' && wallCount.bleu > 0){
                 horizontalWall(hWl,first_square,second_square);
                 removeWallFromWallList('bleu');
-                tour = 'rouge'; // On passe la main au rouge
+                nextPlayer();
             } else if(tour == 'rouge' && wallCount.rouge > 0){
                 horizontalWall(hWl,first_square,second_square);
                 removeWallFromWallList('rouge');
-                if(numOfPlayers == 3 || numOfPlayers == 4){
-                    tour = 'vert'; // On donne la main au vert
-                } else {
-                    tour = 'bleu'; // On donne la main au bleu
-                }
+                nextPlayer();
             } else if(tour == 'vert' && wallCount.vert > 0){
                 horizontalWall(hWl,first_square,second_square);
                 removeWallFromWallList('vert');
-                if(numOfPlayers == 4){
-                    tour = 'violet'; // On donne la main au violet
-                } else {
-                    tour = 'bleu'; // On donne la main au bleu
-                }
+                nextPlayer();
             } else if(tour == 'violet' && wallCount.violet > 0){
                 horizontalWall(hWl,first_square,second_square);
                 removeWallFromWallList('violet');
-                tour = 'bleu'; // On donne la main au bleu
+                nextPlayer();
             }
         }
     }
